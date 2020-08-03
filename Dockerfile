@@ -7,7 +7,8 @@ RUN apt update \
 COPY srcs/wordpress /var/www/wordpress
 COPY srcs/phpmyadmin /var/www/phpmyadmin
 
-RUN apt install php-fpm php-mysql -y 
+# install both packages 
+RUN apt install php-fpm php-mysql -y
 
 RUN mkdir test
 
