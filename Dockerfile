@@ -5,6 +5,7 @@ RUN apt update \
 && apt install mariadb-server -y
 
 COPY srcs/wordpress /var/www/wordpress
+COPY srcs/phpmyadmin /var/www/phpmyadmin
 
 RUN apt install php-fpm php-mysql -y 
 
