@@ -1,0 +1,5 @@
+CREATE DATABASE wordpress;
+CREATE USER 'jherrald'@'localhost' IDENTIFIED BY 'jherrald';
+GRANT ALL ON wordpress.* TO 'jherrald'@'localhost' IDENTIFIED BY 'jherrald' WITH GRAND OPTION;
+FLUSH PRIVILEGES;
+EXIT;
