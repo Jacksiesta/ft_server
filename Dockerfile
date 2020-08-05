@@ -21,16 +21,23 @@ COPY srcs/nginx_conf /etc/nginx/sites-available/
 # activate config by linking to the config file from nginx's sites-enables directory
 RUN ln -s /etc/nginx/sites-available/nginx_cong /etc/nginx/sites-enabled/
 
+# unlink nginx default config file
+RUN unlink /etc/nginx/sites-enabled/default
+
 #copy db creation file
 COPY srcs/maria_conf .
 
 # lauch + create db with maria_onf as root
 RUN service mysql start && cat maria_conf | mariadb -u root
 
-RUN mkdir /var/www/mydomain
+# RUN mkdir /var/www/mydomain
 
 RUN mkdir test
 
+# settings for openssl
+RUN openssl dhparam -out /etc/nginx/dhparam.pem 2048
+
 #starts mysql php nginx
 CMD service mysql start && service php-fpm start && nginx -g "daemon off;"
+
 #CMD  service nginx restart && tail -f /dev/null
