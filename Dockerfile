@@ -2,7 +2,8 @@ FROM debian:buster
 
 RUN apt update \
 && apt install nginx -y \
-&& apt install mariadb-server -y
+&& apt install mariadb-server -y \
+&& apt install mysql-server -y
 
 COPY srcs/wordpress /var/www/wordpress
 COPY srcs/phpmyadmin /var/www/phpmyadmin
