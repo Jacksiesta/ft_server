@@ -1,43 +1,38 @@
 FROM debian:buster
 
-RUN echo 'HELLO'
+LABEL maintainer=jherrald
 
-RUN apt update \
-&& apt install nginx -y \
-&& apt install mariadb-server -y \
-&& apt install mysql-server -y
+# install packages 
+RUN apt-get update
+RUN apt-get install -y sudo
+RUN apt-get install -y nginx
+RUN apt-get install -y php7.3-fpm
+RUN apt-get install -y php7.3-mysql
+RUN apt-get install -y mariadb-server
+RUN apt-get install -y openssl
+
+# copy nginx configuration file
+COPY /srcs/nginxconf /etc/nginx/sites-available/
 
 COPY srcs/wordpress /var/www/wordpress
 COPY srcs/phpmyadmin /var/www/phpmyadmin
-
-# install both packages 
-RUN apt install php-fpm php-mysql -y
-
-RUN apt install openssl -y
-
-# copy nginx configuration file
-COPY srcs/nginx_conf /etc/nginx/sites-available/
+RUN rm -rf /var/www/html
 
 # activate config by linking to the config file from nginx's sites-enables directory
-RUN ln -s /etc/nginx/sites-available/nginx_cong /etc/nginx/sites-enabled/
+RUN ln -sf /etc/nginx/sites-available/nginx_conf /etc/nginx/sites-enabled/
 
 # unlink nginx default config file
 RUN unlink /etc/nginx/sites-enabled/default
 
 #copy db creation file
-COPY srcs/maria_conf .
+COPY srcs/maria_conf.sql .
 
 # lauch + create db with maria_onf as root
-RUN service mysql start && cat maria_conf | mariadb -u root
-
-# RUN mkdir /var/www/mydomain
-
-RUN mkdir test
+RUN service mysql start && cat maria_conf.sql | mariadb -u root
 
 # settings for openssl
-RUN openssl dhparam -out /etc/nginx/dhparam.pem 2048
+RUN openssl req -x509 -nodes -days 365 -subj "/C=CA/ST=QC/O=Company, Inc./CN=jherrald" -addext "subjectAltName=DNS:jherrald" -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt;
 
-#starts mysql php nginx
-CMD service mysql start && service php-fpm start && nginx -g "daemon off;"
+#starts mysql php nginx + command to run continuously
+CMD service mysql start && service php7.3-fpm start && nginx -g "daemon off;"
 
-#CMD  service nginx restart && tail -f /dev/null

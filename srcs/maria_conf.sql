@@ -1,0 +1,4 @@
+CREATE DATABASE wp_db CHARACTER SET utf8mb4 COLLATE 'utf8mb4_general_ci';
+CREATE USER 'admin' IDENTIFIED BY 'admin';
+GRANT ALL ON *.* TO 'admin';
+FLUSH PRIVILEGES;
