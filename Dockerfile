@@ -1,6 +1,6 @@
 FROM debian:buster
 
-LABEL maintainer=jherrald
+#LABEL maintainer=jherrald
 
 # install packages 
 RUN apt-get update
