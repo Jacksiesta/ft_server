@@ -1,7 +1,5 @@
 FROM debian:buster
 
-#LABEL maintainer=jherrald
-
 # install packages 
 RUN apt-get update
 RUN apt-get install -y sudo
@@ -35,4 +33,3 @@ RUN openssl req -x509 -nodes -days 365 -subj "/C=CA/ST=QC/O=Company, Inc./CN=jhe
 
 #starts mysql php nginx + command to run continuously
 CMD service mysql start && service php7.3-fpm start && nginx -g "daemon off;"
-
