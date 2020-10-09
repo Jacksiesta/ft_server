@@ -962,7 +962,7 @@ form.login select {
 }
 
 li.last.database{
-    margin-bottom: 15px
+    margin-bottom: 15px !important;
 }
 /******************************************************************************/
 /* specific elements */
@@ -2994,6 +2994,10 @@ input.btn {
 
 body .ui-widget {
     font-size: 1em;
+}
+
+body #ui-datepicker-div {
+    z-index: 9999 !important;
 }
 
 .ui-dialog fieldset legend a {

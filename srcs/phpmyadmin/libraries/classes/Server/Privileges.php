@@ -878,12 +878,8 @@ class Privileges
             )
         );
 
-        $html_output = Template::get('privileges/resource_limits')
+        return Template::get('privileges/resource_limits')
             ->render(array('limits' => $limits));
-
-        $html_output .= '</fieldset>' . "\n";
-
-        return $html_output;
     }
 
     /**
@@ -1816,8 +1812,11 @@ class Privileges
             && $mode == 'change'
         ) {
             $row = $GLOBALS['dbi']->fetchSingleRow(
-                'SELECT `plugin` FROM `mysql`.`user` WHERE '
-                . '`User` = "' . $username . '" AND `Host` = "' . $hostname . '" LIMIT 1'
+                'SELECT `plugin` FROM `mysql`.`user` WHERE `User` = "'
+                . $GLOBALS['dbi']->escapeString($username)
+                . '" AND `Host` = "'
+                . $GLOBALS['dbi']->escapeString($hostname)
+                . '" LIMIT 1'
             );
             // Table 'mysql'.'user' may not exist for some previous
             // versions of MySQL - in that case consider fallback value
@@ -1828,8 +1827,11 @@ class Privileges
             list($username, $hostname) = $GLOBALS['dbi']->getCurrentUserAndHost();
 
             $row = $GLOBALS['dbi']->fetchSingleRow(
-                'SELECT `plugin` FROM `mysql`.`user` WHERE '
-                . '`User` = "' . $username . '" AND `Host` = "' . $hostname . '"'
+                'SELECT `plugin` FROM `mysql`.`user` WHERE `User` = "'
+                . $GLOBALS['dbi']->escapeString($username)
+                . '" AND `Host` = "'
+                . $GLOBALS['dbi']->escapeString($hostname)
+                . '"'
             );
             if (isset($row) && $row && ! empty($row['plugin'])) {
                 $authentication_plugin = $row['plugin'];
@@ -1838,7 +1840,7 @@ class Privileges
             $row = $GLOBALS['dbi']->fetchSingleRow(
                 'SELECT @@default_authentication_plugin'
             );
-            $authentication_plugin = $row['@@default_authentication_plugin'];
+            $authentication_plugin = is_array($row) ? $row['@@default_authentication_plugin'] : null;
         }
 
         return $authentication_plugin;
@@ -1969,8 +1971,8 @@ class Privileges
                     . " `authentication_string` = '" . $hashedPassword
                     . "', `Password` = '', "
                     . " `plugin` = '" . $authentication_plugin . "'"
-                    . " WHERE `User` = '" . $username . "' AND Host = '"
-                    . $hostname . "';";
+                    . " WHERE `User` = '" . $GLOBALS['dbi']->escapeString($username)
+                    . "' AND Host = '" . $GLOBALS['dbi']->escapeString($hostname) . "';";
             } else {
                 // USE 'SET PASSWORD ...' syntax for rest of the versions
                 // Backup the old value, to be reset later
@@ -1980,8 +1982,8 @@ class Privileges
                 $orig_value = $row['@@old_passwords'];
                 $update_plugin_query = "UPDATE `mysql`.`user` SET"
                     . " `plugin` = '" . $authentication_plugin . "'"
-                    . " WHERE `User` = '" . $username . "' AND Host = '"
-                    . $hostname . "';";
+                    . " WHERE `User` = '" . $GLOBALS['dbi']->escapeString($username)
+                    . "' AND Host = '" . $GLOBALS['dbi']->escapeString($hostname) . "';";
 
                 // Update the plugin for the user
                 if (!($GLOBALS['dbi']->tryQuery($update_plugin_query))) {
@@ -3071,7 +3073,7 @@ class Privileges
 
         if (isset($_GET['validate_username'])) {
             $sql_query = "SELECT * FROM `mysql`.`user` WHERE `User` = '"
-                . $_GET['username'] . "';";
+                . $GLOBALS['dbi']->escapeString($_GET['username']) . "';";
             $res = $GLOBALS['dbi']->query($sql_query);
             $row = $GLOBALS['dbi']->fetchRow($res);
             if (empty($row)) {
@@ -3872,7 +3874,7 @@ class Privileges
             }
             $drop_user_error = '';
             foreach ($queries as $sql_query) {
-                if ($sql_query{0} != '#') {
+                if ($sql_query[0] != '#') {
                     if (! $GLOBALS['dbi']->tryQuery($sql_query)) {
                         $drop_user_error .= $GLOBALS['dbi']->getError() . "\n";
                     }
@@ -4119,7 +4121,7 @@ class Privileges
     {
         $tmp_count = 0;
         foreach ($queries as $sql_query) {
-            if ($sql_query{0} != '#') {
+            if ($sql_query[0] != '#') {
                 $GLOBALS['dbi']->query($sql_query);
             }
             // when there is a query containing a hidden password, take it
@@ -5130,6 +5132,7 @@ class Privileges
      */
     public static function getHashedPassword($password)
     {
+        $password = $GLOBALS['dbi']->escapeString($password);
         $result = $GLOBALS['dbi']->fetchSingleRow(
             "SELECT PASSWORD('" . $password . "') AS `password`;"
         );

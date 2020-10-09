@@ -1,5 +1,7 @@
 FROM debian:buster
 
+#LABEL maintainer=jherrald
+
 # install packages 
 RUN apt-get update
 RUN apt-get install -y sudo
@@ -12,8 +14,8 @@ RUN apt-get install -y openssl
 # copy nginx configuration file
 COPY /srcs/nginxconf /etc/nginx/sites-available/
 
-COPY srcs/wordpress /var/www/wordpress
-COPY srcs/phpmyadmin /var/www/phpmyadmin
+COPY /srcs/phpMyAdmin /var/www/phpmyadmin
+COPY /srcs/wordpress /var/www/wordpress
 RUN rm -rf /var/www/html
 
 # activate config by linking to the config file from nginx's sites-enables directory

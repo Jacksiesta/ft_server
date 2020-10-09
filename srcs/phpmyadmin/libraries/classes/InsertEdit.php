@@ -228,18 +228,16 @@ class InsertEdit
     /**
      * Add some url parameters
      *
-     * @param array  $url_params         containing $db and $table as url parameters
-     * @param array  $where_clause_array where clauses array
-     * @param string $where_clause       where clause
+     * @param array $url_params         containing $db and $table as url parameters
+     * @param array $where_clause_array where clauses array
      *
      * @return array Add some url parameters to $url_params array and return it
      */
     public function urlParamsInEditMode(
         array $url_params,
-        array $where_clause_array,
-        $where_clause
+        array $where_clause_array
     ) {
-        if (isset($where_clause)) {
+        if (isset($where_clause_array)) {
             foreach ($where_clause_array as $where_clause) {
                 $url_params['where_clause'] = trim($where_clause);
             }
@@ -1627,7 +1625,7 @@ class InsertEdit
                 $readOnly
             );
 
-            if (preg_match('/(VIRTUAL|PERSISTENT|GENERATED)/', $column['Extra'])) {
+            if (preg_match('/(VIRTUAL|PERSISTENT|GENERATED)/', $column['Extra']) && $column['Extra'] !== 'DEFAULT_GENERATED') {
                 $html_output .= '<input type="hidden" name="virtual'
                     . $column_name_appendix . '" value="1" />';
             }
@@ -2077,6 +2075,9 @@ class InsertEdit
             $special_chars = Util::addMicroseconds($column['Default']);
         } elseif ($trueType == 'binary' || $trueType == 'varbinary') {
             $special_chars = bin2hex($column['Default']);
+        } elseif ('text' === substr($trueType, -4)) {
+            $textDefault = substr($column['Default'], 1, -1);
+            $special_chars = stripcslashes($textDefault !== false ? $textDefault : $column['Default']);
         } else {
             $special_chars = htmlspecialchars($column['Default']);
         }
