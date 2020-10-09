@@ -30,13 +30,9 @@ VBoxManage unregistervm --delete default 2> /dev/null
 docker-machine rm default -y
 
 docker-machine create --driver virtualbox default
-# Used for first run
 eval $(docker-machine env default)
 # For testing purpose
 docker run hello-world
-
-
-echo ""
 
 echo -e '\033[0;31m/!\ \033[0mDone, enjoy docker.'
 echo -e '\033[0;31m/!\ \033[0mEach time you are going to log out, you will have to run this script again.'
