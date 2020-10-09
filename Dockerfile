@@ -19,7 +19,7 @@ COPY srcs/phpmyadmin /var/www/phpmyadmin
 RUN rm -rf /var/www/html
 
 # activate config by linking to the config file from nginx's sites-enables directory
-RUN ln -sf /etc/nginx/sites-available/nginx_conf /etc/nginx/sites-enabled/
+RUN ln -sf /etc/nginx/sites-available/nginxconf /etc/nginx/sites-enabled/
 
 # unlink nginx default config file
 RUN unlink /etc/nginx/sites-enabled/default
